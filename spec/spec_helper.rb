@@ -19,6 +19,11 @@ Dir[File.join(File.dirname(__FILE__), "factories", "*.rb")].each do |file|
   require file
 end
 
+# support内のRubyファイルを読み込む
+Dir[File.join(File.dirname(__FILE__), "support", "*.rb")].each do |file|
+  require file
+end
+
 set :run, false
 set :raise_errors, true
 
