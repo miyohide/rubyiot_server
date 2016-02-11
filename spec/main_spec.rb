@@ -127,6 +127,29 @@ RSpec.describe MainApp do
           }.to_json)
         end
       end
+
+      context "weekly" do
+        before do
+          dp = create(:sensor_dp)
+          base_time = Time.new(2016, 1, 4, 11)
+
+          @sd1 = create(:sensor_data, device_property_id: dp.id, measured_at: base_time + 6*60*60, value: "123")
+          @sd2 = create(:sensor_data, device_property_id: dp.id, measured_at: base_time + 2*6*60*60, value: "456")
+          @sd3 = create(:sensor_data, device_property_id: dp.id, measured_at: base_time + 3*6*60*60, value: "789")
+          get "/api/sensor_data", sensor_id: dp.id, start: base_time.to_s, span: "weekly"
+        end
+
+        include_examples "return_status_code", 200
+
+        it "返されるJSONにSensorDataの値が設定されていること" do
+          expect(last_response.body).to be_json_eql(
+            {
+              @sd1.measured_at.strftime("%Y-%m-%d %H:%M:%S") => @sd1.value.to_f.to_s,
+              @sd2.measured_at.strftime("%Y-%m-%d %H:%M:%S") => @sd2.value.to_f.to_s,
+              @sd3.measured_at.strftime("%Y-%m-%d %H:%M:%S") => @sd3.value.to_f.to_s,
+            }.to_json)
+        end
+      end
     end
 
     context "POST" do
